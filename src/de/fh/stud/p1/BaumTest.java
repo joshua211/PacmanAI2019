@@ -1,5 +1,8 @@
 package de.fh.stud.p1;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.fh.pacman.enums.PacmanTileType;
 
 public class BaumTest {
@@ -14,9 +17,20 @@ public class BaumTest {
 		};
 		//Startposition des Pacman
 		int posX = 1, posY = 1;
+		List<Knoten> tree = new ArrayList<Knoten>();
+		Knoten parent = new Knoten(view, posX, posY, null);
+		tree.add(parent);
+		while(tree.size() < 10) {
+			tree.addAll(parent.expand());
+			parent = tree.get(tree.indexOf(parent) +1);
+			tree.forEach(k -> System.out.println(k));
+		}
+		tree.forEach(k -> System.out.println(k));
+		
+
 		/*
-		 * TODO Praktikum 1 [3]: Baut hier basierend auf dem gegebenen 
-		 * Anfangszustand (siehe view, posX und posY) den Suchbaum auf.
-		 */
+		/ Problem: Die Knoten rechts und unter dem Startknoten können als folgeknoten nur den Startknoten expandieren
+		/ und wiederholen sich? Keine Ahnung
+		*/
 	}
 }
