@@ -6,7 +6,7 @@ import java.util.List;
 import de.fh.pacman.enums.PacmanTileType;
 
 public class Knoten {
-	
+
 	PacmanTileType[][] view;
 	Knoten parent;
 	int x, y;
@@ -40,6 +40,11 @@ public class Knoten {
 			children.add(new Knoten(view, x-1, y, this));
 
 		return children;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("X: %d, Y:%d Current: %s",x, y, current.name());
 	}
 	
 }
