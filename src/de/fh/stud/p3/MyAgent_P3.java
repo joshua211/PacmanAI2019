@@ -1,5 +1,9 @@
 package de.fh.stud.p3;
 
+import java.util.Stack;
+
+import com.sun.tools.classfile.StackMap_attribute.stack_map_frame;
+
 import de.fh.agent.Agent;
 import de.fh.agent.PacmanAgent;
 import de.fh.pacman.PacmanPercept;
@@ -7,6 +11,7 @@ import de.fh.pacman.enums.PacmanAction;
 import de.fh.pacman.enums.PacmanActionEffect;
 import de.fh.pacman.enums.PacmanTileType;
 import de.fh.stud.p1.Knoten;
+import de.fh.util.Vector2;
 
 public class MyAgent_P3 extends PacmanAgent {
 
@@ -28,8 +33,12 @@ public class MyAgent_P3 extends PacmanAgent {
 	 */
 	private Knoten loesungsKnoten;
 	
+	private Stack<PacmanAction> path;
+	
+	
 	public MyAgent_P3(String name) {
 		super(name);
+		path  = new Stack<PacmanAction>();
 	}
 	
 	public static void main(String[] args) {
@@ -81,15 +90,15 @@ public class MyAgent_P3 extends PacmanAgent {
 		
 		
 		//Gebe den aktuellen Zustand der Welt aus
-		String view_row = "";
-		System.out.println("viewsize: " + view.length + "*" + view[0].length);
-		for (int x = 0; x < view[0].length; x++) {
-			for (int y = 0; y < view.length; y++) {
-				view_row += " " + view[y][x];
-			}
-			System.out.println(view_row);
-			view_row = "";
-		}
+//		String view_row = "";
+//		System.out.println("viewsize: " + view.length + "*" + view[0].length);
+//		for (int x = 0; x < view[0].length; x++) {
+//			for (int y = 0; y < view.length; y++) {
+//				view_row += " " + view[y][x];
+//			}
+//			System.out.println(view_row);
+//			view_row = "";
+//		}
 		System.out.println("-------------------------------");
 		
 	}
@@ -113,24 +122,35 @@ public class MyAgent_P3 extends PacmanAgent {
 		 */
 		
 		//Wenn noch keine Lösung gefunden wurde, dann starte die Suche
-		if (loesungsKnoten == null) {
+		if (path.isEmpty()) {
 			/*
 			 * TODO Praktikum 3 [3]: Übergeben Sie hier der Suche die notwendigen Informationen, um
 			 * von einem Startzustand zu einem Zielzustand zu gelangen.
 			 */
+			Knoten current = new Knoten(view, this.percept.getPosition().getX(), this.percept.getPosition().getY(), null, null);
+			
 			/*
 			 * TODO Praktikum 4 [2]: Entscheiden Sie hier welches Suchverfahren ausgeführt werden soll.
 			 */
 			Suche suche = new Suche();
-			loesungsKnoten = suche.start();
+			
+			loesungsKnoten = suche.start(current);
+			
+			Knoten n = loesungsKnoten;
+			
+			while(n != current) {
+				path.push(n.getParentDirection());
+				n = n.getParent();			
+			}
+			
+			System.out.println(loesungsKnoten);
 		}
 		
 		//Wenn die Suche eine Lösung gefunden hat, dann ermittle die als nächstes auszuführende Aktion
-		if (loesungsKnoten != null) {
-			/*
-			 * TODO Praktikum 3 [4]: Ermitteln Sie hier die als naechstes auszufuehrende Aktion
-			 * basierend auf dem loesungsknoten und weisen Sie diese nextAction zu.
-			 */
+		if (!path.isEmpty()) {
+			PacmanAction a = path.pop();
+			nextAction = a;
+			System.out.println(a);
 			
 		} else {
 			//Ansonsten wurde keine Lösung gefunden und der Pacman kann das Spiel aufgeben

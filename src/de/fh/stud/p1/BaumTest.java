@@ -18,7 +18,7 @@ public class BaumTest {
 		//Startposition des Pacman
 		int posX = 1, posY = 1;
 		List<Knoten> tree = new ArrayList<Knoten>();
-		Knoten parent = new Knoten(view, posX, posY, null);
+		Knoten parent = new Knoten(view, posX, posY, null, null);
 		tree.add(parent);
 		while(tree.size() < 10) {
 			tree.addAll(parent.expand());
