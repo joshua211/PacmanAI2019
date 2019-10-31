@@ -1,19 +1,22 @@
 package de.fh.stud.p2;
 
+import de.fh.agent.Agent;
 import de.fh.agent.PacmanAgent;
 import de.fh.pacman.PacmanPercept;
 import de.fh.pacman.enums.PacmanAction;
 import de.fh.pacman.enums.PacmanActionEffect;
-
-import de.fh.agent.Agent;
 import de.fh.pacman.enums.PacmanTileType;
+import de.fh.util.Vector2;
 
 public class MyAgent_P2 extends PacmanAgent {
 
 	/*
 	 * TODO Praktikum 2 [1]: Fügt gemäß der Aufgabenstellung neue Attribute hinzu, falls notwendig.
 	 */
-	
+	boolean hasDot;
+	private Vector2 nextTile;
+	private Vector2 rightTile;
+	private Vector2 leftTile;
 	/**
 	 * Die letzte Wahrnehmung der Spielwelt
 	 */
@@ -82,21 +85,53 @@ public class MyAgent_P2 extends PacmanAgent {
 		
 		//Beispiel:
 		//Gebe den aktuellen Zustand der Welt aus
-		String view_row = "";
-		System.out.println("Weltgröße: " + view.length + "*" + view[0].length);
-		for (int x = 0; x < view[0].length; x++) {
-			for (int y = 0; y < view.length; y++) {
-				view_row += " " + view[y][x];
-			}
-			System.out.println(view_row);
-			view_row = "";
-		}
-		System.out.println("-------------------------------");
+//		String view_row = "";
+//		System.out.println("Weltgröße: " + view.length + "*" + view[0].length);
+//		for (int x = 0; x < view[0].length; x++) {
+//			for (int y = 0; y < view.length; y++) {
+//				view_row += " " + view[y][x];
+//			}
+//			System.out.println(view_row);
+//			view_row = "";
+//		}
+//		System.out.println("-------------------------------");
 		
 		
 		/*
 		 * TODO Praktikum 2 [1]: Erweitern Sie diese updateState-Methode gemäß der Aufgabenstellung.
 		 */
+		nextTile = new Vector2(this.percept.getPosition().getX(), percept.getPosition().getY());
+		rightTile = new Vector2(this.percept.getPosition().getX(), percept.getPosition().getY());
+		leftTile = new Vector2(this.percept.getPosition().getX(), percept.getPosition().getY());
+		
+		switch (nextAction) {
+		case GO_NORTH:
+			nextTile.setY(nextTile.getY() - 1);
+			rightTile.setX(rightTile.getX()+1);
+			leftTile.setX(leftTile.getX() - 1);
+			break;
+		case GO_EAST:
+			nextTile.setX(nextTile.getX() + 1);
+			rightTile.setY(rightTile.getY() + 1);
+			leftTile.setY(leftTile.getY() - 1);
+			break;
+		case GO_SOUTH:
+			nextTile.setY(nextTile.getY() + 1);
+			rightTile.setX(rightTile.getX() - 1);
+			leftTile.setX(leftTile.getX() + 1);
+			break;
+		case GO_WEST:
+			nextTile.setX(nextTile.getX() - 1);
+			rightTile.setY(rightTile.getY() - 1);
+			leftTile.setY(leftTile.getY() + 1);
+			break;
+		default:
+			break;
+		}
+		System.out.println(nextTile.getX() + " " + nextTile.getY());
+		System.out.println(rightTile.getX() + " " + rightTile.getY());
+		System.out.println(percept.getPosition());
+		hasDot = view[nextTile.getX()][nextTile.getY()] == PacmanTileType.DOT;
 		
 	}
 	
@@ -110,19 +145,82 @@ public class MyAgent_P2 extends PacmanAgent {
 		
 		/*
 		 * Die möglichen zurückzugebenden PacmanActions sind:
-		 * PacmanAction.GO_EAST
 		 * PacmanAction.GO_NORTH
-		 * PacmanAction.GO_SOUTH
 		 * PacmanAction.GO_WEST
+		 * PacmanAction.GO_EAST
+		 * PacmanAction.GO_SOUTH
 		 * PacmanAction.QUIT_GAME
 		 * PacmanAction.WAIT
 		 */
 		
+		
 		//Nachdem das Spiel gestartet wurde, geht der Agent nach Osten
+//		if(bumoed into wall)
+//			nextaction++
+		
+		if(!hasDot) {
+			if(view[rightTile.getX()][rightTile.getY()] == PacmanTileType.DOT) {
+					switch (nextAction) {
+					case GO_NORTH:
+						nextAction=PacmanAction.GO_EAST;
+						break;
+					case GO_EAST:
+						nextAction=PacmanAction.GO_SOUTH;
+						break;
+					case GO_SOUTH:
+						nextAction=PacmanAction.GO_WEST;
+						break;
+					case GO_WEST:
+						nextAction=PacmanAction.GO_NORTH;
+						break;
+					default:
+						break;
+					}
+			}
+			else if(view[leftTile.getX()][leftTile.getY()] == PacmanTileType.DOT) {
+				switch (nextAction) {
+				case GO_NORTH:
+					nextAction=PacmanAction.GO_WEST;
+					break;
+				case GO_EAST:
+					nextAction=PacmanAction.GO_NORTH;
+					break;
+				case GO_SOUTH:
+					nextAction=PacmanAction.GO_EAST;
+					break;
+				case GO_WEST:
+					nextAction=PacmanAction.GO_SOUTH;
+					break;
+				default:
+					break;
+				}
+		}
+			else
+				nextAction = PacmanAction.values()[(int)Math.floor(Math.random()*4)];
+			
+		}
+		
+		if(actionEffect == PacmanActionEffect.BUMPED_INTO_WALL) {
+			switch (nextAction) {
+			case GO_NORTH:
+				nextAction=PacmanAction.GO_EAST;
+				break;
+			case GO_EAST:
+				nextAction=PacmanAction.GO_SOUTH;
+				break;
+			case GO_SOUTH:
+				nextAction=PacmanAction.GO_WEST;
+				break;
+			case GO_WEST:
+				nextAction=PacmanAction.GO_NORTH;
+				break;
+			default:
+				break;
+			}
+		}
 		if(actionEffect == PacmanActionEffect.GAME_INITIALIZED) {
 			nextAction = PacmanAction.GO_EAST;
 		}
-		
 		/*
 		 * TODO Praktikum 2 [1]: Erweitern Sie diese action-Methode gemäß der Aufgabenstellung.
 		 */
