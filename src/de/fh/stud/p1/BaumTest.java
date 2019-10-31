@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.fh.pacman.enums.PacmanTileType;
+import de.fh.util.Vector2;
 
 public class BaumTest {
 
@@ -16,9 +17,9 @@ public class BaumTest {
 				{PacmanTileType.WALL,PacmanTileType.WALL,PacmanTileType.WALL,PacmanTileType.WALL}
 		};
 		//Startposition des Pacman
-		int posX = 1, posY = 1;
+		Vector2 pos = new Vector2(1, 1);
 		List<Knoten> tree = new ArrayList<Knoten>();
-		Knoten parent = new Knoten(view, posX, posY, null, null);
+		Knoten parent = new Knoten(view, pos);
 		tree.add(parent);
 		while(tree.size() < 10) {
 			tree.addAll(parent.expand());
