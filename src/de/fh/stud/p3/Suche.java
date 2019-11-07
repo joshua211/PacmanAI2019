@@ -2,6 +2,7 @@ package de.fh.stud.p3;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import de.fh.pacman.enums.PacmanTileType;
 import de.fh.stud.p1.Knoten;
@@ -22,7 +23,27 @@ public class Suche {
 	
 	public Knoten start(Knoten startKnoten) {
 		
-		return Tiefensuche(startKnoten);
+		// return Tiefensuche(startKnoten);
+		return Breitensuche(startKnoten);
+	}
+	
+	
+	public Knoten Breitensuche(Knoten node) {
+		Queue<Knoten> q = new LinkedList<Knoten>();
+		q.add(node);
+		
+		while(!q.isEmpty()) {
+			Knoten n = q.poll();		
+			if(!besucht.contains(n)) {
+				besucht.add(n);
+				if(n.getCurrent() == PacmanTileType.DOT)
+					return n;
+				else
+					q.addAll(n.expand());
+			}		
+		}
+		return null;
+		
 	}
 	
 	public Knoten Tiefensuche(Knoten node) {
