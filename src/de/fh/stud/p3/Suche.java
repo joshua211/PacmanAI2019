@@ -9,7 +9,8 @@ import de.fh.stud.p1.Knoten;
 
 public class Suche {
 	
-	private LinkedList<Knoten> besucht = new LinkedList<Knoten>();
+	public Queue<Knoten> openList = new LinkedList<Knoten>();
+	public List<Knoten> closedList = new LinkedList<Knoten>();
 	/*
 	 * TODO Praktikum 3 [1]: Erweitern Sie diese Klasse um die notwendigen
 	 * Attribute und Methoden um eine Tiefensuche durchfÃ¼hren zu kÃ¶nnen.
@@ -23,24 +24,27 @@ public class Suche {
 	
 	public Knoten start(Knoten startKnoten) {
 		
-		// return Tiefensuche(startKnoten);
+		//return Tiefensuche(startKnoten);
 		return Breitensuche(startKnoten);
 	}
 	
 	
 	public Knoten Breitensuche(Knoten node) {
-		Queue<Knoten> q = new LinkedList<Knoten>();
-		q.add(node);
-		
-		while(!q.isEmpty()) {
-			Knoten n = q.poll();		
-			if(!besucht.contains(n)) {
-				besucht.add(n);
+		openList.add(node);
+		System.out.println(openList);
+		System.out.println(closedList);
+		while(!openList.isEmpty()) {
+			Knoten n = openList.poll();
+			
+			if(!closedList.contains(n)) {
+				closedList.add(n);
 				if(n.getCurrent() == PacmanTileType.DOT)
 					return n;
 				else
-					q.addAll(n.expand());
-			}		
+					openList.addAll(n.expand());
+			}	
+			System.out.println("open  : " + openList);
+			System.out.println("closed: " + closedList);
 		}
 		return null;
 		
@@ -48,9 +52,9 @@ public class Suche {
 	
 	public Knoten Tiefensuche(Knoten node) {
 		
-		if(besucht.contains(node)) 
+		if(closedList.contains(node)) 
 			return null;
-		besucht.add(node);
+		closedList.add(node);
 		
 		Knoten nextDotNode = null;
 		if(node.getCurrent() != PacmanTileType.DOT) {
@@ -65,5 +69,20 @@ public class Suche {
 			nextDotNode = node;
 		return nextDotNode;
 	} 
+	
+	/*
+	 * function greedy search (…)
+Initialisierung: Queue EXP_KAND = [(Startknoten, Bewertung)]
+loop do
+if EXP_KAND == leer then return Fehler
+Entnehme das führende Tupel (k,b) aus EXP_KAND
+// das Wegstück k mit der niedrigsten Bewertung b
+if “k führt zum Ziel” then return k
+else expandiere k (Kind-Knoten: Elements)
+KnotenEinfuegen(EXP_KAND, Elements) =
+Füge Elements der Bewertung nach aufsteigend sortiert den Wegstücken
+in der Queue EXP_KAND hinzu.
+	 * */
+
 	
 }
