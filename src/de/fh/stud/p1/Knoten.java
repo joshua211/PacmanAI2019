@@ -5,7 +5,7 @@ import java.util.List;
 
 import de.fh.pacman.enums.PacmanAction;
 import de.fh.pacman.enums.PacmanTileType;
-import de.fh.stud.p3.MyAgent_P3;
+import de.fh.stud.p3.Suche;
 import de.fh.util.Vector2;
 
 /**
@@ -54,7 +54,7 @@ public class Knoten {
 	 * Position des Knotens
 	 */
 	private Vector2 pos;
-
+	
 	/**
 	 * Echter Constructor
 	 * 
@@ -72,8 +72,9 @@ public class Knoten {
 			this.parentDirection = parentDirection;
 		else
 			throw new RuntimeException("ungültiger Wert für parentDirection: " + parentDirection.name());
+		
 	}
-
+	
 	/**
 	 * Wrapper Constructor mit pos als Vector
 	 * 
@@ -146,5 +147,17 @@ public class Knoten {
 	public boolean equals(Object object) {
 		Knoten knoten = (Knoten) object;
 		return this.getPos().equals(knoten.getPos());
+	}
+	
+	public int getHeuristik() {
+	
+		if(this.current == PacmanTileType.DOT)
+			return 0;
+		Knoten ziel = new Suche().Breitensuche(this);
+		int x = ziel.getPos().getX()-this.getPos().getX();
+		int y = ziel.getPos().getY()-this.getPos().getY();
+		int dist = x*x + y*y;
+		dist = (int) Math.sqrt(dist);
+		return dist;
 	}
 }
