@@ -2,6 +2,7 @@ package de.fh.stud.p1;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
 
 import de.fh.pacman.enums.PacmanAction;
 import de.fh.pacman.enums.PacmanTileType;
@@ -93,18 +94,37 @@ public class Knoten {
 		int x = pos.getX();
 		int y = pos.getY();
 
-		if (view[x][y - 1] != PacmanTileType.WALL)// north
-			children.add(new Knoten(view, new Vector2(x, y - 1), this, PacmanAction.GO_NORTH));
-
-		if (view[x + 1][y] != PacmanTileType.WALL)// east
+		//North
+		if (view[x][y - 1] != PacmanTileType.WALL) {
+			PacmanTileType[][] newView = copyView(view);
+			newView[x][y -1] = PacmanTileType.PACMAN;
+			newView[x][y] = PacmanTileType.EMPTY;
+			children.add(new Knoten(newView, new Vector2(x, y - 1), this, PacmanAction.GO_NORTH));
+		}
+			
+		//East
+		if (view[x + 1][y] != PacmanTileType.WALL) {
+			PacmanTileType[][] newView = copyView(view);
+			newView[x + 1][y] = PacmanTileType.PACMAN;
+			newView[x][y] = PacmanTileType.EMPTY;
 			children.add(new Knoten(view, new Vector2(x + 1, y), this, PacmanAction.GO_EAST));
+		}
 
-		if (view[x][y + 1] != PacmanTileType.WALL)// south
+		//South
+		if (view[x][y + 1] != PacmanTileType.WALL) {
+			PacmanTileType[][] newView = copyView(view);
+			newView[x][y + 1] = PacmanTileType.PACMAN;
+			newView[x][y] = PacmanTileType.EMPTY;
 			children.add(new Knoten(view, new Vector2(x, y + 1), this, PacmanAction.GO_SOUTH));
+		}
 
-		if (view[x - 1][y] != PacmanTileType.WALL)// west
+		//West
+		if (view[x - 1][y] != PacmanTileType.WALL) {
+			PacmanTileType[][] newView = copyView(view);
+			newView[x - 1][y] = PacmanTileType.PACMAN;
+			newView[x][y] = PacmanTileType.EMPTY;
 			children.add(new Knoten(view, new Vector2(x - 1, y), this, PacmanAction.GO_WEST));
-
+		}
 		return children;
 	}
 
@@ -137,6 +157,10 @@ public class Knoten {
 	public Vector2 getPos() {
 		return pos;
 	}
+	
+	public PacmanTileType[][] getView() {
+		return view;
+	}
 
 	@Override
 	public String toString() {
@@ -146,7 +170,7 @@ public class Knoten {
 	@Override
 	public boolean equals(Object object) {
 		Knoten knoten = (Knoten) object;
-		return this.getPos().equals(knoten.getPos());
+		return this.getPos().equals(knoten.getPos()) && Arrays.equals(this.view, knoten.getView());
 	}
 	
 	public int getHeuristik() {
@@ -159,5 +183,13 @@ public class Knoten {
 		int dist = x*x + y*y;
 		dist = (int) Math.sqrt(dist);
 		return dist;
+	}
+	
+	public PacmanTileType[][] copyView(PacmanTileType[][] view) {
+		PacmanTileType[][] newView = new PacmanTileType[view.length][view[0].length];
+		for (int y = 0; y < view.length; y++) 
+			for (int x = 0; x < view[0].length; x++) 
+				newView[y][x] = view[y][x];	
+		return newView;
 	}
 }

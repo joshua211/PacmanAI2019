@@ -87,16 +87,16 @@ public class MyAgent_P3 extends PacmanAgent {
 		this.view = percept.getView();
 
 		// Gebe den aktuellen Zustand der Welt aus
-		// String view_row = "";
-		// System.out.println("viewsize: " + view.length + "*" + view[0].length);
-		// for (int x = 0; x < view[0].length; x++) {
-		// for (int y = 0; y < view.length; y++) {
-		// view_row += " " + view[y][x];
-		// }
-		// System.out.println(view_row);
-		// view_row = "";
-		// }
-		// System.out.println("-------------------------------");
+//		 String view_row = "";
+//		 System.out.println("viewsize: " + view.length + "*" + view[0].length);
+//		 for (int x = 0; x < view[0].length; x++) {
+//		 for (int y = 0; y < view.length; y++) {
+//		 view_row += " " + view[y][x];
+//		 }
+//		 System.out.println(view_row);
+//		 view_row = "";
+//		 }
+//		 System.out.println("-------------------------------");
 
 	}
 
@@ -117,7 +117,7 @@ public class MyAgent_P3 extends PacmanAgent {
 	@Override
 	public PacmanAction action() {
 		// Wenn noch keine Lösung gefunden wurde, dann starte die Suche
-		if (path.isEmpty()) {
+		if (loesungsKnoten == null) {
 			Knoten current = new Knoten(view, percept.getPosition());
 
 			/*
