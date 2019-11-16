@@ -1,17 +1,18 @@
 package de.fh.stud.p1;
 
-import java.util.List;
-import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Stream;
 
 import de.fh.pacman.enums.PacmanAction;
 import de.fh.pacman.enums.PacmanTileType;
+import de.fh.stud.p3.Util;
 import de.fh.util.Vector2;
 
 /**
  * Knoten ist die Welt zu einem bestimmten Zeitpunkt
  */
-public class Knoten {
+public class Knoten implements Comparable<Knoten> {
 	/**
 	 * aktuelle Welt
 	 */
@@ -34,7 +35,10 @@ public class Knoten {
 	 * </ul>
 	 * <br>
 	 */
-	private PacmanAction parentDirection;
+
+	private int heuristik;
+
+	private PacmanAction lastAction;
 	/**
 	 * Position von Pacman
 	 */
@@ -43,16 +47,16 @@ public class Knoten {
 	/**
 	 * Echter Constructor
 	 * 
-	 * @param view            Aktuelle Welt
-	 * @param pos             Position von Pacman
-	 * @param parent          Parent des Knotens
-	 * @param parentDirection Richtung des Parents
+	 * @param view       Aktuelle Welt
+	 * @param pos        Position von Pacman
+	 * @param parent     Parent des Knotens
+	 * @param lastAction Richtung des Parents
 	 */
-	private Knoten(PacmanTileType[][] view, Vector2 pacPos, Knoten parent, PacmanAction parentDirection) {
+	private Knoten(PacmanTileType[][] view, Vector2 pacPos, Knoten parent, PacmanAction lastAction) {
 		this.view = view;
 		this.parent = parent;
 		this.pacPos = pacPos;
-		this.parentDirection = parentDirection;
+		this.lastAction = lastAction;
 	}
 
 	/**
@@ -75,7 +79,7 @@ public class Knoten {
 
 		// North
 		if (view[x][y - 1] != PacmanTileType.WALL) {
-			PacmanTileType[][] newView = copyView(view);
+			PacmanTileType[][] newView = Util.copyView(view);
 			newView[x][y - 1] = PacmanTileType.PACMAN;
 			newView[x][y] = PacmanTileType.EMPTY;
 			children.add(new Knoten(newView, new Vector2(x, y - 1), this, PacmanAction.GO_NORTH));
@@ -83,7 +87,7 @@ public class Knoten {
 
 		// East
 		if (view[x + 1][y] != PacmanTileType.WALL) {
-			PacmanTileType[][] newView = copyView(view);
+			PacmanTileType[][] newView = Util.copyView(view);
 			newView[x + 1][y] = PacmanTileType.PACMAN;
 			newView[x][y] = PacmanTileType.EMPTY;
 			children.add(new Knoten(newView, new Vector2(x + 1, y), this, PacmanAction.GO_EAST));
@@ -91,7 +95,7 @@ public class Knoten {
 
 		// South
 		if (view[x][y + 1] != PacmanTileType.WALL) {
-			PacmanTileType[][] newView = copyView(view);
+			PacmanTileType[][] newView = Util.copyView(view);
 			newView[x][y + 1] = PacmanTileType.PACMAN;
 			newView[x][y] = PacmanTileType.EMPTY;
 			children.add(new Knoten(newView, new Vector2(x, y + 1), this, PacmanAction.GO_SOUTH));
@@ -99,7 +103,7 @@ public class Knoten {
 
 		// West
 		if (view[x - 1][y] != PacmanTileType.WALL) {
-			PacmanTileType[][] newView = copyView(view);
+			PacmanTileType[][] newView = Util.copyView(view);
 			newView[x - 1][y] = PacmanTileType.PACMAN;
 			newView[x][y] = PacmanTileType.EMPTY;
 			children.add(new Knoten(newView, new Vector2(x - 1, y), this, PacmanAction.GO_WEST));
@@ -115,11 +119,11 @@ public class Knoten {
 	}
 
 	/**
-	 * @see Knoten#parentDirection
+	 * @see Knoten#lastAction
 	 * @return Richtung des Parents
 	 */
-	public PacmanAction getParentDirection() {
-		return parentDirection;
+	public PacmanAction getLastAction() {
+		return lastAction;
 	}
 
 	/**
@@ -149,43 +153,52 @@ public class Knoten {
 		return str;
 	}
 
-	@Override
-	public boolean equals(Object object) {
-		Knoten knoten = (Knoten) object;
-		return Arrays.equals(this.view, knoten.getView());
-	}
+	/**
+	 * @return Heurstik des aktuellen Knotens in abhängigkeit der Anzahl von dots in
+	 *         seiner Umgebung
+	 */
+	public int getHeuristik() {
+		heuristik = 0;
+		if (Util.isDotAtPosition(view, this))
+			heuristik++;
+		Stream<Knoten> s = expand().stream();
+		s.forEach(n -> {
+			if (Util.isDotAtPosition(view, n))
+				heuristik++;
+		});
 
-	// public int getHeuristik() {
-	// if(this.current == PacmanTileType.DOT)
-	// return 0;
-	// Knoten ziel = new Suche().Breitensuche(this);
-	// int x = ziel.getPos().getX()-this.getPos().getX();
-	// int y = ziel.getPos().getY()-this.getPos().getY();
-	// int dist = x*x + y*y;
-	// dist = (int) Math.sqrt(dist);
-	// return dist;
-	// }
-
-	public PacmanTileType[][] copyView(PacmanTileType[][] view) {
-		PacmanTileType[][] newView = new PacmanTileType[view.length][view[0].length];
-		for (int y = 0; y < view.length; y++)
-			for (int x = 0; x < view[0].length; x++)
-				newView[y][x] = view[y][x];
-		return newView;
+		return heuristik;
 	}
 
 	public boolean isFinished() {
-		// System.out.println("Betrachte knoten: " + this.getPacPos());
 		for (int x = 0; x < view.length; x++) {
 			for (int y = 0; y < view[0].length; y++) {
 				if (view[x][y] == PacmanTileType.DOT) {
-					// System.out.println("####################false##################");
 					return false;
 				}
 			}
 		}
-		// System.out.println("####################true###################");
+		System.out.println(this);
 		return true;
-
 	}
+
+	@Override
+	public int compareTo(Knoten n) {
+		int h = getHeuristik();
+		int nh = n.getHeuristik();
+		return h == nh ? 0 : (h < nh ? -1 : 1);
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		Knoten knoten = (Knoten) object;
+		for (int i = 0; i < view.length; i++) {
+			for (int j = 0; j < view[0].length; j++) {
+				if (!view[i][j].equals((knoten.getView()[i][j])))
+					return false;
+			}
+		}
+		return true;
+	}
+
 }
