@@ -2,7 +2,6 @@ package de.fh.stud.p1;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Stream;
 
 import de.fh.pacman.enums.PacmanAction;
 import de.fh.pacman.enums.PacmanTileType;
@@ -38,6 +37,9 @@ public class Knoten implements Comparable<Knoten> {
 
 	private int heuristik;
 
+	public static int expansions = 0;
+	public int id;
+
 	private PacmanAction lastAction;
 	/**
 	 * Position von Pacman
@@ -57,6 +59,8 @@ public class Knoten implements Comparable<Knoten> {
 		this.parent = parent;
 		this.pacPos = pacPos;
 		this.lastAction = lastAction;
+		expansions++;
+		this.id = expansions;
 	}
 
 	/**
@@ -143,6 +147,7 @@ public class Knoten implements Comparable<Knoten> {
 	@Override
 	public String toString() {
 		String str = "";
+		str += "ID: " + id;
 		str += "viewsize: " + view.length + "*" + view[0].length + "\n";
 		for (int x = 0; x < view[0].length; x++) {
 			String view_row = "";
@@ -158,16 +163,7 @@ public class Knoten implements Comparable<Knoten> {
 	 *         seiner Umgebung
 	 */
 	public int getHeuristik() {
-		heuristik = 0;
-		if (Util.isDotAtPosition(view, this))
-			heuristik++;
-		Stream<Knoten> s = expand().stream();
-		s.forEach(n -> {
-			if (Util.isDotAtPosition(view, n))
-				heuristik++;
-		});
-
-		return heuristik;
+		return Util.countDots(this);
 	}
 
 	public boolean isFinished() {

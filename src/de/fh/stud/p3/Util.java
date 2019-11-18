@@ -16,7 +16,20 @@ public class Util {
 		return newView;
 	}
 
-	public static int countNodes(Knoten node) {
+	public static int countDots(Knoten node) {
+		int count = 0;
+		PacmanTileType[][] view = node.getView();
+		for (int i = 0; i < view.length; i++) {
+			for (int j = 0; j < view[1].length; j++) {
+				if (view[i][j] == PacmanTileType.DOT)
+					count++;
+			}
+		}
+
+		return count;
+	}
+
+	public static int countNodesFromStart(Knoten node) {
 		int count = 0;
 		while (node.getParent() != null) {
 			node = node.getParent();
