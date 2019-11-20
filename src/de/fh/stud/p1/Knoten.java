@@ -186,6 +186,15 @@ public class Knoten implements Comparable<Knoten> {
 		return true;
 	}
 
+	public int getCost() {
+		
+		return parent == null ? 2 :  (Util.isDotAtPosition(parent.getView(), this) ? 1 : 1);
+	}
+	
+	public int getTotalCost() {
+		return getHeuristik() + getCost();
+	}
+	
 	@Override
 	public int compareTo(Knoten n) {
 		int h = getHeuristik();
@@ -196,13 +205,25 @@ public class Knoten implements Comparable<Knoten> {
 	@Override
 	public boolean equals(Object object) {
 		Knoten knoten = (Knoten) object;
+		
 		for (int i = 0; i < view.length; i++) {
 			for (int j = 0; j < view[0].length; j++) {
 				if (!view[i][j].equals((knoten.getView()[i][j])))
 					return false;
 			}
 		}
+		if(lastAction != knoten.getLastAction())
+			return false;
 		return true;
 	}
+	
 
 }
+
+/*
+ * 01234
+ * 12
+ */
+
+
+
