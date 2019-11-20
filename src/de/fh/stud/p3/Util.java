@@ -1,5 +1,7 @@
 package de.fh.stud.p3;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Stack;
 
 import de.fh.pacman.enums.PacmanAction;
@@ -35,7 +37,6 @@ public class Util {
 			node = node.getParent();
 			count++;
 		}
-
 		return count;
 	}
 
@@ -54,6 +55,74 @@ public class Util {
 		}
 
 		return path;
+	}
+
+	/**
+	 * heuristik zu dem nächsten dot;
+	 * 
+	 * @param view
+	 *            view von dem knoten für den die heuristik berechnet wird
+	 * @param node
+	 *            knoten für den die heuristik berechnet wird
+	 * @return anzahl der schritte die pacman gehen müsste<br>
+	 *         um den nächsten dot zu erreichen von <b>node</b> ausgehend
+	 */
+	public static int tempHeuristik(PacmanTileType[][] view, Knoten node) {
+		// counter sagt die distanz von dem Knoten der die funktion aufruft bis zum
+		// nächsten knoten der einen Dot besitzt
+		int count = 0;
+		// temporäre liste die alle knoten enthällt
+		List<Knoten> open = new LinkedList<Knoten>();
+		List<Knoten> closed = new LinkedList<Knoten>();
+		// alle knoten um den jetzigen herum hinzufügen
+		closed.addAll(node.expand());
+		// debug nachricht
+		System.out.println(closed.stream().anyMatch(k -> isDotAtPosition(view, k)));
+		// solange in den neuen knoten kein dot gegessen wird
+		while (!closed.stream().anyMatch(k -> isDotAtPosition(view, k))) {
+			// nächste ebene hinzufügen
+			closed.forEach(k -> open.addAll(k.expand()));
+			closed.addAll(open);
+			open.clear();
+			// die distanz erhöhen weil pacman einen schritt mehr gehen muss bis er einen möglichen dot erreicht
+			count++;
+			// debug nachricht
+			if (closed.stream().anyMatch(k -> isDotAtPosition(view, k)))
+				System.out.println(count);
+		}
+		return count;
+	}
+	
+	/**
+	 * heuristik bis zum zielknoten
+	 * 
+	 * @param view
+	 *            view von dem knoten für den die heuristik berechnet wird
+	 * @param node
+	 *            knoten für den die heuristik berechnet wird
+	 * @return anzhal an schritten die pacman gehen müsste um einen zielknoten zu erreichen
+	 */
+	public static int tempZielHeuristik(PacmanTileType[][] view, Knoten node) {
+		// counter sagt die distanz von dem Knoten der die funktion aufruft bis zum
+		// nächsten zielKnoten
+		int count = 1;
+		// temporäre liste die alle knoten enthällt
+		List<Knoten> liste = new LinkedList<Knoten>();
+		// alle knoten um den jetzigen herum hinzufügen
+		liste.addAll(node.expand());
+		// debug nachricht
+		System.out.println(liste.stream().anyMatch(k -> isDotAtPosition(view, k)));
+		// solange kein zielknoten existiert
+		while (!liste.stream().anyMatch(k -> k.isFinished())) {
+			// nächste ebene hinzufügen
+			liste.forEach(k -> k.expand());
+			// die distanz erhöhen weil pacman einen schritt mehr gehen muss bis er einen möglichen dot erreicht
+			count++;
+			// debug nachricht
+			if (liste.stream().anyMatch(k -> k.isFinished()))
+				System.out.println(count);
+		}
+		return count;
 	}
 
 }

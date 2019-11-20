@@ -35,8 +35,10 @@ public class Knoten implements Comparable<Knoten> {
 	 * <br>
 	 */
 
-	private int heuristik;
-
+	private int heuristik = -1;
+	public int f=0;
+	public int g=0;
+	public int h=0;
 	public static int expansions = 0;
 	public int id;
 
@@ -49,10 +51,14 @@ public class Knoten implements Comparable<Knoten> {
 	/**
 	 * Echter Constructor
 	 * 
-	 * @param view       Aktuelle Welt
-	 * @param pos        Position von Pacman
-	 * @param parent     Parent des Knotens
-	 * @param lastAction Richtung des Parents
+	 * @param view
+	 *            Aktuelle Welt
+	 * @param pos
+	 *            Position von Pacman
+	 * @param parent
+	 *            Parent des Knotens
+	 * @param lastAction
+	 *            Richtung des Parents
 	 */
 	private Knoten(PacmanTileType[][] view, Vector2 pacPos, Knoten parent, PacmanAction lastAction) {
 		this.view = view;
@@ -66,8 +72,10 @@ public class Knoten implements Comparable<Knoten> {
 	/**
 	 * Wrapper Constructor
 	 * 
-	 * @param view Aktuelle Welt
-	 * @param pos  Position von Pacman
+	 * @param view
+	 *            Aktuelle Welt
+	 * @param pos
+	 *            Position von Pacman
 	 */
 	public Knoten(PacmanTileType[][] view, Vector2 pacPos) {
 		this(view, pacPos, null, null);
