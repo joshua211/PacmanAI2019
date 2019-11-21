@@ -36,9 +36,6 @@ public class Knoten implements Comparable<Knoten> {
 	 */
 
 	private int heuristik = -1;
-	public int f=0;
-	public int g=0;
-	public int h=0;
 	public static int expansions = 0;
 	public int id;
 
@@ -51,14 +48,10 @@ public class Knoten implements Comparable<Knoten> {
 	/**
 	 * Echter Constructor
 	 * 
-	 * @param view
-	 *            Aktuelle Welt
-	 * @param pos
-	 *            Position von Pacman
-	 * @param parent
-	 *            Parent des Knotens
-	 * @param lastAction
-	 *            Richtung des Parents
+	 * @param view       Aktuelle Welt
+	 * @param pos        Position von Pacman
+	 * @param parent     Parent des Knotens
+	 * @param lastAction Richtung des Parents
 	 */
 	private Knoten(PacmanTileType[][] view, Vector2 pacPos, Knoten parent, PacmanAction lastAction) {
 		this.view = view;
@@ -72,10 +65,8 @@ public class Knoten implements Comparable<Knoten> {
 	/**
 	 * Wrapper Constructor
 	 * 
-	 * @param view
-	 *            Aktuelle Welt
-	 * @param pos
-	 *            Position von Pacman
+	 * @param view Aktuelle Welt
+	 * @param pos  Position von Pacman
 	 */
 	public Knoten(PacmanTileType[][] view, Vector2 pacPos) {
 		this(view, pacPos, null, null);
@@ -156,6 +147,7 @@ public class Knoten implements Comparable<Knoten> {
 	public String toString() {
 		String str = "";
 		str += "ID: " + id;
+		str += " ";
 		str += "viewsize: " + view.length + "*" + view[0].length + "\n";
 		for (int x = 0; x < view[0].length; x++) {
 			String view_row = "";
@@ -182,19 +174,18 @@ public class Knoten implements Comparable<Knoten> {
 				}
 			}
 		}
-		System.out.println(this);
 		return true;
 	}
 
 	public int getCost() {
-		
-		return parent == null ? 2 :  (Util.isDotAtPosition(parent.getView(), this) ? 1 : 1);
+
+		return parent == null ? 0 : parent.getCost() + 1;
 	}
-	
+
 	public int getTotalCost() {
 		return getHeuristik() + getCost();
 	}
-	
+
 	@Override
 	public int compareTo(Knoten n) {
 		int h = getHeuristik();
@@ -205,25 +196,16 @@ public class Knoten implements Comparable<Knoten> {
 	@Override
 	public boolean equals(Object object) {
 		Knoten knoten = (Knoten) object;
-		
+
 		for (int i = 0; i < view.length; i++) {
 			for (int j = 0; j < view[0].length; j++) {
 				if (!view[i][j].equals((knoten.getView()[i][j])))
 					return false;
 			}
 		}
-		if(lastAction != knoten.getLastAction())
+		if (lastAction != knoten.getLastAction())
 			return false;
 		return true;
 	}
-	
 
 }
-
-/*
- * 01234
- * 12
- */
-
-
-
